@@ -1,0 +1,5 @@
+menuconfig MODULES_CFG_LOGGER
+	bool "cfg_logger"
+	default n
+	---help---
+		Enable support for cfg_logger
