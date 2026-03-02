@@ -37,6 +37,9 @@
 #include <lib/systemlib/mavlink_log.h>
 #include <uORB/topics/vehicle_command.h>
 
+extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+
+
 ModuleBase::Descriptor ManualControl::desc{task_spawn, custom_command, print_usage};
 
 ManualControl::ManualControl() :
@@ -153,12 +156,19 @@ void ManualControl::processInput(hrt_abstime now)
 
 		_manual_control_switches_sub.registerCallback();
 
+		cfp_logger_increment_transition_counter(3);		
+
 	} else {
 		if (!_published_invalid_once) {
 			_published_invalid_once = true;
 			_manual_control_setpoint_pub.publish(_selector.setpoint());
+			cfp_logger_increment_transition_counter(4);			
+		} else {
+			cfp_logger_increment_transition_counter(5);
 		}
 
+		cfp_logger_increment_transition_counter(6);
+		
 		_roll_diff.reset();
 		_pitch_diff.reset();
 		_yaw_diff.reset();

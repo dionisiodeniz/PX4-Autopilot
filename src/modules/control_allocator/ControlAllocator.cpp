@@ -46,6 +46,8 @@
 #include <mathlib/math/Limits.hpp>
 #include <mathlib/math/Functions.hpp>
 
+extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+
 using namespace matrix;
 using namespace time_literals;
 
@@ -441,6 +443,10 @@ ControlAllocator::Run()
 
 			if (_has_slew_rate) {
 				_control_allocation[i]->applySlewRateLimit(dt);
+
+				cfp_logger_increment_transition_counter(9);
+			} else {
+				cfp_logger_increment_transition_counter(10);
 			}
 
 			_control_allocation[i]->clipActuatorSetpoint();

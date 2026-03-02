@@ -17,8 +17,9 @@
 # and unlimited distribution.  Please see Copyright notice for non-US Government use and distribution.
 #
 # This Software includes and/or makes use of Third-Party Software each subject to its own license.
+#
+#DM26-0076
 
-DM26-0076
 px4_add_module(
 	MODULE modules_cfg_logger
 	MAIN cfg_logger

@@ -39,6 +39,9 @@
 #include <mathlib/math/Functions.hpp>
 #include <px4_platform_common/events.h>
 
+extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+
+
 using namespace matrix;
 using namespace time_literals;
 using math::radians;
@@ -176,6 +179,8 @@ MulticopterRateControl::Run()
 				vehicle_rates_setpoint.timestamp = hrt_absolute_time();
 
 				_vehicle_rates_setpoint_pub.publish(vehicle_rates_setpoint);
+
+				cfp_logger_increment_transition_counter(6);
 			}
 
 		} else if (_vehicle_rates_setpoint_sub.update(&vehicle_rates_setpoint)) {
@@ -184,6 +189,8 @@ MulticopterRateControl::Run()
 				_rates_setpoint(1) = PX4_ISFINITE(vehicle_rates_setpoint.pitch) ? vehicle_rates_setpoint.pitch : rates(1);
 				_rates_setpoint(2) = PX4_ISFINITE(vehicle_rates_setpoint.yaw)   ? vehicle_rates_setpoint.yaw   : rates(2);
 				_thrust_setpoint = Vector3f(vehicle_rates_setpoint.thrust_body);
+
+				cfp_logger_increment_transition_counter(7);
 			}
 		}
 
@@ -266,6 +273,8 @@ MulticopterRateControl::Run()
 			_vehicle_torque_setpoint_pub.publish(vehicle_torque_setpoint);
 
 			updateActuatorControlsStatus(vehicle_torque_setpoint, dt);
+
+			cfp_logger_increment_transition_counter(8);
 
 		}
 	}
