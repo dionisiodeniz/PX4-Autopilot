@@ -46,6 +46,8 @@ __EXPORT int cfg_logger_main(int argc, char *argv[]);
 
 __EXPORT int cfp_logger_increment_transition_counter(int transition_idx);
 
+static int cfg_logger_active=0;
+
 int cfg_logger_main(int argc, char *argv[])
 {
 	PX4_INFO("CFG_Logger");
@@ -60,6 +62,12 @@ int cfg_logger_main(int argc, char *argv[])
 					printf("transition[%d].counter = %llu\n",i,transition_counters[i]);
 				}
 			}
+		}else if (!strcmp(argv[1], "start")){
+			cfg_logger_active = 1;
+		}else if (!strcmp(argv[1], "stop")){
+			cfg_logger_active = 0;
+		} else {
+			PX4_INFO("unrecognized command. Valid commands: reset, dump, start, stop");
 		}
 	}
 	return 0;
@@ -70,6 +78,10 @@ int cfp_logger_increment_transition_counter(int transition_idx){
 		PX4_INFO("CFG_logger.cfp_logger_increment_transition_counter(): transition index out of bounds");
 		return -1;
 	}
-	transition_counters[transition_idx] += 1L;
+
+	if (cfg_logger_active){
+		transition_counters[transition_idx] += 1L;
+	}
+
 	return 0;
 }
