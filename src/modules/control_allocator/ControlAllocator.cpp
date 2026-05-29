@@ -399,6 +399,7 @@ ControlAllocator::Run()
 
 	if (_vehicle_thrust_setpoint_sub.update(&vehicle_thrust_setpoint)) {
 		_thrust_sp = matrix::Vector3f(vehicle_thrust_setpoint.xyz);
+		cfp_logger_increment_transition_counter(11);
 	}
 
 	if (do_update) {

@@ -180,7 +180,7 @@ MulticopterRateControl::Run()
 
 				_vehicle_rates_setpoint_pub.publish(vehicle_rates_setpoint);
 
-				cfp_logger_increment_transition_counter(6);
+				cfp_logger_increment_transition_counter(12);
 			}
 
 		} else if (_vehicle_rates_setpoint_sub.update(&vehicle_rates_setpoint)) {
@@ -190,7 +190,7 @@ MulticopterRateControl::Run()
 				_rates_setpoint(2) = PX4_ISFINITE(vehicle_rates_setpoint.yaw)   ? vehicle_rates_setpoint.yaw   : rates(2);
 				_thrust_setpoint = Vector3f(vehicle_rates_setpoint.thrust_body);
 
-				cfp_logger_increment_transition_counter(7);
+				cfp_logger_increment_transition_counter(13);
 			}
 		}
 
@@ -274,7 +274,7 @@ MulticopterRateControl::Run()
 
 			updateActuatorControlsStatus(vehicle_torque_setpoint, dt);
 
-			cfp_logger_increment_transition_counter(8);
+			cfp_logger_increment_transition_counter(14);
 
 		}
 	}

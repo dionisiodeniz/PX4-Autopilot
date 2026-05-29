@@ -156,19 +156,20 @@ void ManualControl::processInput(hrt_abstime now)
 
 		_manual_control_switches_sub.registerCallback();
 
-		cfp_logger_increment_transition_counter(3);		
+		cfp_logger_increment_transition_counter(3);
 
 	} else {
 		if (!_published_invalid_once) {
 			_published_invalid_once = true;
 			_manual_control_setpoint_pub.publish(_selector.setpoint());
-			cfp_logger_increment_transition_counter(4);			
+			cfp_logger_increment_transition_counter(4);
 		} else {
 			cfp_logger_increment_transition_counter(5);
 		}
 
-		cfp_logger_increment_transition_counter(6);
-		
+		// transition counter 6 was already used.
+		//cfp_logger_increment_transition_counter(6);
+
 		_roll_diff.reset();
 		_pitch_diff.reset();
 		_yaw_diff.reset();

@@ -21,8 +21,8 @@ DM26-0076
  * @author Example User <mail@example.com>
  */
 
-//#include <px4_platform_common/module.h>
-//#include <px4_platform_common/module_params.h>
+#include <px4_platform_common/module.h>
+#include <px4_platform_common/module_params.h>
 
 #include <px4_platform_common/px4_config.h>
 #include <px4_platform_common/log.h>
@@ -47,9 +47,11 @@ unsigned long long transition_counters[MAX_TRANSITIONS];
 
 __EXPORT int cfg_logger_main(int argc, char *argv[]);
 
-__EXPORT int cfp_logger_increment_transition_counter(int transition_idx);
+//__EXPORT int cfp_logger_increment_transition_counter(int transition_idx);
 
 static int cfg_logger_active=0;
+
+static ModuleBase::Descriptor desc{nullptr, nullptr,nullptr};
 
 int cfg_logger_main(int argc, char *argv[])
 {
@@ -59,37 +61,25 @@ int cfg_logger_main(int argc, char *argv[])
 			memset(transition_counters,0,sizeof(unsigned long long)*MAX_TRANSITIONS);
 			PX4_INFO("counters reset");
 		} else if (!strcmp(argv[1], "dump")){
-			FILE *fptr = fopen("transitions.json", "w");
-			fprintf(fptr, "[\n");
 			printf("Transition counters > 0:\n");
-			int firsttime=1;
 			for (int i=0;i<MAX_TRANSITIONS;i++){
 				if (transition_counters[i] >0){
-				  if (!firsttime){
-				    fprintf(fptr,",");
-				  } else {
-				    firsttime=0;
-				  }
-					fprintf(fptr,"{\"transition_number\": %d,\n",i);
-					fprintf(fptr,"\"count\": %llu}\n",transition_counters[i]);
-					printf("transition[%d].counter = %llu,\n",i,transition_counters[i]);
+					printf("transition[%d].counter = %llu\n",i,transition_counters[i]);
 				}
 			}
-			fprintf(fptr, "]\n");
-			fclose(fptr);
 		}else if (!strcmp(argv[1], "start")){
 			cfg_logger_active = 1;
 		}else if (!strcmp(argv[1], "stop")){
 			cfg_logger_active = 0;
 		} else {
-			//return ModuleBase::main(Logger::desc, argc, argv);
-			PX4_INFO("unrecognized command. Valid commands: reset, dump, start, stop");
+			return ModuleBase::main(desc, argc, argv);
+			//PX4_INFO("unrecognized command. Valid commands: reset, dump, start, stop");
 		}
 	}
-	return 0;//ModuleBase::main(Logger::desc, argc, argv);
+	return ModuleBase::main(desc, argc, argv);
 }
 
-int cfp_logger_increment_transition_counter(int transition_idx){
+extern "C" int cfp_logger_increment_transition_counter(int transition_idx){
 	if (transition_idx >= MAX_TRANSITIONS || transition_idx<0){
 		PX4_INFO("CFG_logger.cfp_logger_increment_transition_counter(): transition index out of bounds");
 		return -1;
@@ -101,3 +91,4 @@ int cfp_logger_increment_transition_counter(int transition_idx){
 
 	return 0;
 }
+

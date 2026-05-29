@@ -62,6 +62,8 @@
 
 using namespace time_literals;
 
+extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+
 namespace navigator
 {
 Navigator *g_navigator;
@@ -242,6 +244,7 @@ void Navigator::run()
 		// Handle Vehicle commands
 		int vehicle_command_updates = 0;
 
+
 		while (_wait_for_vehicle_status_timestamp == 0 && _vehicle_command_sub.updated()
 		       && (vehicle_command_updates < vehicle_command_s::ORB_QUEUE_LENGTH)) {
 			vehicle_command_updates++;
@@ -268,15 +271,21 @@ void Navigator::run()
 				// Wait for vehicle_status before handling the next command, otherwise the setpoint could be overwritten
 				_wait_for_vehicle_status_timestamp = hrt_absolute_time();
 
+				cfp_logger_increment_transition_counter(1);
+
+
 				vehicle_global_position_s position_setpoint{};
 
 				if (PX4_ISFINITE(cmd.param5) && PX4_ISFINITE(cmd.param6)) {
 					position_setpoint.lat = cmd.param5;
 					position_setpoint.lon = cmd.param6;
 
+					cfp_logger_increment_transition_counter(2);
 				} else {
 					position_setpoint.lat = get_global_position()->lat;
 					position_setpoint.lon = get_global_position()->lon;
+
+					cfp_logger_increment_transition_counter(3);
 				}
 
 				position_setpoint.alt = PX4_ISFINITE(cmd.param7) ? cmd.param7 : get_global_position()->alt;
@@ -692,6 +701,9 @@ void Navigator::run()
 				// CMD_MISSION_START is acknowledged by commander
 
 			} else if (cmd.command == vehicle_command_s::VEHICLE_CMD_DO_CHANGE_SPEED) {
+
+				cfp_logger_increment_transition_counter(4);
+
 				if (cmd.param2 > FLT_EPSILON) {
 					// XXX not differentiating ground and airspeed yet
 					set_cruising_speed(cmd.param2);

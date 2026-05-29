@@ -51,6 +51,9 @@
 
 #include "AttitudeControl/AttitudeControlMath.hpp"
 
+extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+
+
 using namespace matrix;
 
 ModuleBase::Descriptor MulticopterAttitudeControl::desc{task_spawn, custom_command, print_usage};
@@ -244,6 +247,8 @@ MulticopterAttitudeControl::Run()
 	vehicle_attitude_s v_att;
 
 	if (_vehicle_attitude_sub.update(&v_att)) {
+
+		cfp_logger_increment_transition_counter(11);
 
 		// Guard against too small (< 0.2ms) and too large (> 20ms) dt's.
 		const float dt = math::constrain(((v_att.timestamp_sample - _last_run) * 1e-6f), 0.0002f, 0.02f);

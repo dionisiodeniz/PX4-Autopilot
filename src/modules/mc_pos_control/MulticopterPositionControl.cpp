@@ -39,6 +39,9 @@
 #include <px4_platform_common/events.h>
 #include "PositionControl/ControlMath.hpp"
 
+extern "C" int cfp_logger_increment_transition_counter(int);
+
+
 using namespace matrix;
 
 ModuleBase::Descriptor MulticopterPositionControl::desc{task_spawn, custom_command, print_usage};
@@ -398,6 +401,8 @@ void MulticopterPositionControl::Run()
 			math::constrain(((vehicle_local_position.timestamp_sample - _time_stamp_last_loop) * 1e-6f), 0.002f, 0.04f);
 		_time_stamp_last_loop = vehicle_local_position.timestamp_sample;
 
+		cfp_logger_increment_transition_counter(5);
+
 		_sample_interval_s.update(dt);
 
 		if (_vehicle_control_mode_sub.updated()) {
@@ -449,7 +454,13 @@ void MulticopterPositionControl::Run()
 			    && (vehicle_local_position.timestamp_sample > _time_position_control_enabled)) {
 
 				_setpoint = generateFailsafeSetpoint(vehicle_local_position.timestamp_sample, states, false);
+
+				cfp_logger_increment_transition_counter(6);
+			} else {
+				cfp_logger_increment_transition_counter(7);
 			}
+		} else {
+			cfp_logger_increment_transition_counter(8);
 		}
 
 		if (_vehicle_control_mode.flag_multicopter_position_control_enabled
@@ -579,7 +590,11 @@ void MulticopterPositionControl::Run()
 				// Valid control update - store for fallback
 				_last_valid_setpoint = _setpoint;
 
+				cfp_logger_increment_transition_counter(9);
+
 			} else {
+
+				cfp_logger_increment_transition_counter(10);
 
 				// Initial update failed - Try fallback if within timeout
 				if (now < _last_valid_setpoint.timestamp + 200_ms) {
