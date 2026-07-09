@@ -34,6 +34,8 @@
 #include "ActuatorEffectivenessHelicopter.hpp"
 #include <lib/mathlib/mathlib.h>
 
+extern "C" int cfg_logger_increment_transition_counter(int transition_idx);
+
 using namespace matrix;
 using namespace time_literals;
 
@@ -171,9 +173,22 @@ void ActuatorEffectivenessHelicopter::updateSetpoint(const matrix::Vector<float,
 	if (actuator_sp(1) < actuator_min(1)) {
 		setSaturationFlag(_geometry.yaw_sign, _saturation_flags.yaw_neg, _saturation_flags.yaw_pos);
 
+		// cfg_logger addition
+		cfg_logger_increment_transition_counter(19);
 	} else if (actuator_sp(1) > actuator_max(1)) {
 		setSaturationFlag(_geometry.yaw_sign, _saturation_flags.yaw_pos, _saturation_flags.yaw_neg);
+
+		// cfg_logger addition
+		 cfg_logger_increment_transition_counter(20);
 	}
+
+	// cfg_logger addition
+	else {
+		cfg_logger_increment_transition_counter(21);
+	}
+
+	cfg_logger_increment_transition_counter(22);
+
 
 	for (int i = 0; i < _geometry.num_swash_plate_servos; i++) {
 		float roll_coeff = sinf(_geometry.swash_plate_servos[i].angle) * _geometry.swash_plate_servos[i].arm_length;
@@ -193,11 +208,24 @@ void ActuatorEffectivenessHelicopter::updateSetpoint(const matrix::Vector<float,
 			setSaturationFlag(roll_coeff, _saturation_flags.roll_pos, _saturation_flags.roll_neg);
 			setSaturationFlag(pitch_coeff, _saturation_flags.pitch_neg, _saturation_flags.pitch_pos);
 
+			// cfg_logger addition
+			cfg_logger_increment_transition_counter(23);
 		} else if (actuator_sp(_first_swash_plate_servo_index + i) > actuator_max(_first_swash_plate_servo_index + i)) {
 			setSaturationFlag(roll_coeff, _saturation_flags.roll_neg, _saturation_flags.roll_pos);
 			setSaturationFlag(pitch_coeff, _saturation_flags.pitch_pos, _saturation_flags.pitch_neg);
+
+			// cfg_logger addition
+			cfg_logger_increment_transition_counter(24);
+
+		}
+		// cfg_logger addition
+		// There is a possibility that there are no "servos" and hence this loop never executes
+		else{
+			cfg_logger_increment_transition_counter(25);
 		}
 	}
+	// cfg_logger addition
+	cfg_logger_increment_transition_counter(26);
 }
 
 float ActuatorEffectivenessHelicopter::getLinearServoOutput(float input) const

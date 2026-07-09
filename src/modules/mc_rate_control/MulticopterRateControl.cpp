@@ -39,7 +39,9 @@
 #include <mathlib/math/Functions.hpp>
 #include <px4_platform_common/events.h>
 
-extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+extern "C" int cfg_logger_increment_transition_counter(int transition_idx);
+extern "C" int cfg_logger_add_debug_value(int valueid, double value);
+
 
 
 using namespace matrix;
@@ -180,7 +182,7 @@ MulticopterRateControl::Run()
 
 				_vehicle_rates_setpoint_pub.publish(vehicle_rates_setpoint);
 
-				cfp_logger_increment_transition_counter(12);
+				cfg_logger_increment_transition_counter(12);
 			}
 
 		} else if (_vehicle_rates_setpoint_sub.update(&vehicle_rates_setpoint)) {
@@ -190,7 +192,11 @@ MulticopterRateControl::Run()
 				_rates_setpoint(2) = PX4_ISFINITE(vehicle_rates_setpoint.yaw)   ? vehicle_rates_setpoint.yaw   : rates(2);
 				_thrust_setpoint = Vector3f(vehicle_rates_setpoint.thrust_body);
 
-				cfp_logger_increment_transition_counter(13);
+				cfg_logger_increment_transition_counter(13);
+				// cfg_logger_add_debug_value(1, _rates_setpoint(0)); // roll
+				// cfg_logger_add_debug_value(2, _rates_setpoint(1)); // pitch
+				// cfg_logger_add_debug_value(3, _rates_setpoint(2)); // yaw
+				// cfg_logger_add_debug_value(4, *vehicle_rates_setpoint.thrust_body); // trust
 			}
 		}
 
@@ -274,7 +280,7 @@ MulticopterRateControl::Run()
 
 			updateActuatorControlsStatus(vehicle_torque_setpoint, dt);
 
-			cfp_logger_increment_transition_counter(14);
+			cfg_logger_increment_transition_counter(14);
 
 		}
 	}

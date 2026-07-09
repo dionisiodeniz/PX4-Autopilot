@@ -51,7 +51,11 @@
 
 #include "AttitudeControl/AttitudeControlMath.hpp"
 
-extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+extern "C" int cfg_logger_increment_transition_counter(int transition_idx);
+
+extern "C" int cfg_logger_add_debug_value(int valueidx, double value);
+extern "C" int cfg_logger_get_euler_from_attitude(float *q, double *yaw, double *roll, double *pitch);
+
 
 
 using namespace matrix;
@@ -248,7 +252,14 @@ MulticopterAttitudeControl::Run()
 
 	if (_vehicle_attitude_sub.update(&v_att)) {
 
-		cfp_logger_increment_transition_counter(11);
+		double yaw,roll,pitch;
+
+		cfg_logger_get_euler_from_attitude(v_att.q, &yaw, &roll, &pitch);
+		// cfg_logger_add_debug_value(5,yaw);
+		// cfg_logger_add_debug_value(6,roll);
+		// cfg_logger_add_debug_value(7,pitch);
+
+		cfg_logger_increment_transition_counter(11);
 
 		// Guard against too small (< 0.2ms) and too large (> 20ms) dt's.
 		const float dt = math::constrain(((v_att.timestamp_sample - _last_run) * 1e-6f), 0.0002f, 0.02f);
@@ -317,8 +328,15 @@ MulticopterAttitudeControl::Run()
 			if (_vehicle_attitude_setpoint_sub.updated()) {
 				vehicle_attitude_setpoint_s vehicle_attitude_setpoint;
 
+				// Dio: just checking if this is where the attitude is updated
+				// cfg_logger_increment_transition_counter(100);
+
+
+
 				if (_vehicle_attitude_setpoint_sub.copy(&vehicle_attitude_setpoint)
 				    && (vehicle_attitude_setpoint.timestamp > _last_attitude_setpoint)) {
+
+					//cfg_set_debug_value(0, vehicle_attitude_setpoint.);
 
 					_attitude_control.setAttitudeSetpoint(Quatf(vehicle_attitude_setpoint.q_d), vehicle_attitude_setpoint.yaw_sp_move_rate);
 					_thrust_setpoint_body = Vector3f(vehicle_attitude_setpoint.thrust_body);

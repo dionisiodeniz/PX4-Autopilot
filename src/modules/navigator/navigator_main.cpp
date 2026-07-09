@@ -62,7 +62,7 @@
 
 using namespace time_literals;
 
-extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+extern "C" int cfg_logger_increment_transition_counter(int transition_idx);
 
 namespace navigator
 {
@@ -271,7 +271,7 @@ void Navigator::run()
 				// Wait for vehicle_status before handling the next command, otherwise the setpoint could be overwritten
 				_wait_for_vehicle_status_timestamp = hrt_absolute_time();
 
-				cfp_logger_increment_transition_counter(1);
+				cfg_logger_increment_transition_counter(1);
 
 
 				vehicle_global_position_s position_setpoint{};
@@ -280,12 +280,12 @@ void Navigator::run()
 					position_setpoint.lat = cmd.param5;
 					position_setpoint.lon = cmd.param6;
 
-					cfp_logger_increment_transition_counter(2);
+					cfg_logger_increment_transition_counter(2);
 				} else {
 					position_setpoint.lat = get_global_position()->lat;
 					position_setpoint.lon = get_global_position()->lon;
 
-					cfp_logger_increment_transition_counter(3);
+					cfg_logger_increment_transition_counter(3);
 				}
 
 				position_setpoint.alt = PX4_ISFINITE(cmd.param7) ? cmd.param7 : get_global_position()->alt;
@@ -702,7 +702,7 @@ void Navigator::run()
 
 			} else if (cmd.command == vehicle_command_s::VEHICLE_CMD_DO_CHANGE_SPEED) {
 
-				cfp_logger_increment_transition_counter(4);
+				cfg_logger_increment_transition_counter(4);
 
 				if (cmd.param2 > FLT_EPSILON) {
 					// XXX not differentiating ground and airspeed yet

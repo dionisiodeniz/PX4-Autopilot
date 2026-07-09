@@ -71,7 +71,7 @@
 #endif
 
 // trying the linkage
-extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+extern "C" int cfg_logger_increment_transition_counter(int transition_idx);
 
 
 
@@ -2122,9 +2122,9 @@ MavlinkReceiver::handle_message_manual_control(mavlink_message_t *msg)
 	// (([0, 1000] / 1000 * 2) - 1 = [-1, 1]
 	if (math::isInRange((int)mavlink_manual_control.z, 0, 1000)) {
 		manual_control_setpoint.throttle = (mavlink_manual_control.z / 500.f) - 1.f;
-		cfp_logger_increment_transition_counter(0);
+		cfg_logger_increment_transition_counter(0);
 	} else {
-		cfp_logger_increment_transition_counter(1);
+		cfg_logger_increment_transition_counter(1);
 	}
 
 	if (math::isInRange((int)mavlink_manual_control.r, -1000, 1000)) { manual_control_setpoint.yaw = mavlink_manual_control.r / 1000.f; }

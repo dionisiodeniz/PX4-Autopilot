@@ -47,7 +47,7 @@ unsigned long long transition_counters[MAX_TRANSITIONS];
 
 __EXPORT int cfg_logger_main(int argc, char *argv[]);
 
-//__EXPORT int cfp_logger_increment_transition_counter(int transition_idx);
+//__EXPORT int cfg_logger_increment_transition_counter(int transition_idx);
 
 static int cfg_logger_active=0;
 
@@ -79,9 +79,9 @@ int cfg_logger_main(int argc, char *argv[])
 	return ModuleBase::main(desc, argc, argv);
 }
 
-extern "C" int cfp_logger_increment_transition_counter(int transition_idx){
+extern "C" int cfg_logger_increment_transition_counter(int transition_idx){
 	if (transition_idx >= MAX_TRANSITIONS || transition_idx<0){
-		PX4_INFO("CFG_logger.cfp_logger_increment_transition_counter(): transition index out of bounds");
+		PX4_INFO("CFG_logger.cfg_logger_increment_transition_counter(): transition index out of bounds");
 		return -1;
 	}
 

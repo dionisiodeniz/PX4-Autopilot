@@ -46,7 +46,7 @@
 #include <mathlib/math/Limits.hpp>
 #include <mathlib/math/Functions.hpp>
 
-extern "C" int cfp_logger_increment_transition_counter(int transition_idx);
+extern "C" int cfg_logger_increment_transition_counter(int transition_idx);
 
 using namespace matrix;
 using namespace time_literals;
@@ -395,11 +395,12 @@ ControlAllocator::Run()
 		do_update = true;
 		_timestamp_sample = vehicle_torque_setpoint.timestamp_sample;
 
+		cfg_logger_increment_transition_counter(15);
 	}
 
 	if (_vehicle_thrust_setpoint_sub.update(&vehicle_thrust_setpoint)) {
 		_thrust_sp = matrix::Vector3f(vehicle_thrust_setpoint.xyz);
-		cfp_logger_increment_transition_counter(11);
+		cfg_logger_increment_transition_counter(16);
 	}
 
 	if (do_update) {
@@ -445,9 +446,9 @@ ControlAllocator::Run()
 			if (_has_slew_rate) {
 				_control_allocation[i]->applySlewRateLimit(dt);
 
-				cfp_logger_increment_transition_counter(9);
+				cfg_logger_increment_transition_counter(17);
 			} else {
-				cfp_logger_increment_transition_counter(10);
+				cfg_logger_increment_transition_counter(18);
 			}
 
 			_control_allocation[i]->clipActuatorSetpoint();
