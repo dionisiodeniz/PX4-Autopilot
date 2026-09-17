@@ -51,8 +51,11 @@
 
 #include "AttitudeControl/AttitudeControlMath.hpp"
 
-extern "C" int cfg_logger_increment_transition_counter(int transition_idx);
 
+
+
+extern "C" int cfg_logger_increment_transition_counter(int transition_idx);
+extern "C" int cfg_get_constant_value(const char *name,double *val);
 extern "C" int cfg_logger_add_debug_value(int valueidx, double value);
 extern "C" int cfg_logger_get_euler_from_attitude(float *q, double *yaw, double *roll, double *pitch);
 
@@ -254,10 +257,51 @@ MulticopterAttitudeControl::Run()
 
 		double yaw,roll,pitch;
 
+		/********************************************************
+		 * Dio: Added code to test roll and pitch thresholds to
+		 * validate "safe" flying according to certification standards
+		 *               *** BEGIN ***
+		*********************************************************/
+
 		cfg_logger_get_euler_from_attitude(v_att.q, &yaw, &roll, &pitch);
-		// cfg_logger_add_debug_value(5,yaw);
-		// cfg_logger_add_debug_value(6,roll);
-		// cfg_logger_add_debug_value(7,pitch);
+		cfg_logger_add_debug_value(5,yaw);
+		cfg_logger_add_debug_value(6,roll);
+		cfg_logger_add_debug_value(7,pitch);
+
+		static bool thresholds_initialized = false;
+		static double roll_threshold = -1.0;
+		static double pitch_threshold = -1.0;
+
+		if (!thresholds_initialized){
+			if (cfg_get_constant_value("roll_threshold",&roll_threshold)==0){
+				if (cfg_get_constant_value("pitch_threshold",&pitch_threshold)==0){
+					thresholds_initialized=true;
+				}
+			}
+		}
+
+		if (thresholds_initialized){
+			if (fabs(roll) > roll_threshold){
+				cfg_logger_increment_transition_counter(40);
+			} else {
+				cfg_logger_increment_transition_counter(41);
+			}
+
+			if (fabs(pitch) > pitch_threshold){
+				cfg_logger_increment_transition_counter(42);
+			} else {
+				cfg_logger_increment_transition_counter(43);
+			}
+		}
+
+
+		/********************************************************
+		 * Dio: Added code to test roll and pitch thresholds to
+		 * validate "safe" flying according to certification standards
+		 *         **** END ****
+		*********************************************************/
+
+
 
 		cfg_logger_increment_transition_counter(11);
 
